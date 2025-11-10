@@ -181,7 +181,7 @@ def load_npy(
     Returns:
         Tensor: Tensor with the contents of the .npy file. Dtype matches the file's dtype.
     """
-    if not module and not path:
+    if module is None and path is None:
         raise ValueError("At least one of `module` or `path` must be provided.")
 
     # 1) Try package resource
@@ -206,3 +206,5 @@ def load_npy(
             return torch.from_numpy(arr.copy())
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Failed to load file from filesystem path: {fs_path}") from e
+
+    raise RuntimeError("Unreachable")
