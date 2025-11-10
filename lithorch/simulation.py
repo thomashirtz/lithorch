@@ -61,10 +61,10 @@ class _SimulateAerialFromMask(torch.autograd.Function):
     @staticmethod
     def backward(  # type: ignore[override]
         ctx,
-        grad_aerial: torch.Tensor, # [..., H, W], real
+        grad_aerial: torch.Tensor,  # [..., H, W], real
     ) -> Tuple[torch.Tensor | None, ...]:
         dosed_mask, fields_main, k, k_ct, s = ctx.saved_tensors
-        grad = grad_aerial.unsqueeze(-3)      # [..., 1, H, W], real
+        grad = grad_aerial.unsqueeze(-3)  # [..., 1, H, W], real
 
         fields_ct = _convolve_frequency_domain(dosed_mask.unsqueeze(-3), k_ct)
         term1 = _convolve_frequency_domain(fields_ct * grad, k)
@@ -79,9 +79,9 @@ class _SimulateAerialFromMask(torch.autograd.Function):
 
 @dataclass
 class SimulationOutput:
-    aerial: torch.Tensor     # [..., H, W], real
-    resist: torch.Tensor     # [..., H, W], real in [0,1]
-    printed: torch.Tensor    # [..., H, W], 0/1
+    aerial: torch.Tensor  # [..., H, W], real
+    resist: torch.Tensor  # [..., H, W], real in [0,1]
+    printed: torch.Tensor  # [..., H, W], 0/1
 
 
 class LithographySimulator(nn.Module):
@@ -94,7 +94,6 @@ class LithographySimulator(nn.Module):
         resist_steepness: float = d.RESIST_STEEPNESS,
         print_threshold: float = d.PRINT_THRESHOLD,
         dtype: torch.dtype = d.DTYPE,
-        trainable: bool = False,   # kept for API parity; grads still only to mask
         margin: int = 0,
         device: torch.device | None = None,
     ) -> None:
@@ -106,7 +105,6 @@ class LithographySimulator(nn.Module):
         self.resist_steepness = float(resist_steepness)
         self.print_threshold = float(print_threshold)
         self.dtype = dtype
-        self.trainable = bool(trainable)
 
         k = load_npy(f"{kernel_type}.npy", module="lithox.kernels", path=p.KERNELS_DIRECTORY)
         k_ct = load_npy(f"{kernel_type}_ct.npy", module="lithox.kernels", path=p.KERNELS_DIRECTORY)
