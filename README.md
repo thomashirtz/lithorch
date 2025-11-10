@@ -68,9 +68,9 @@ plt.show()
 
 **What does `output` contain?**
 
-* `output.aerial: jnp.Array` — continuous aerial intensity $I$ (float32, shape `[H, W]`).
-* `output.resist: jnp.Array` — sigmoid-mapped resist image $R\in(0,1)$ (float32, `[H, W]`).
-* `output.printed: jnp.Array` — binary print $P\in\\{0,1\\}$ (float32, `[H, W]`).
+* `output.aerial: torch.Tensor` — continuous aerial intensity $I$ (float32, shape `[H, W]`).
+* `output.resist: torch.Tensor` — sigmoid-mapped resist image $R\in(0,1)$ (float32, `[H, W]`).
+* `output.printed: torch.Tensor` — binary print $P\in\\{0,1\\}$ (float32, `[H, W]`).
 
 `LithographySimulator` variants (identical API, different conditions):
 
