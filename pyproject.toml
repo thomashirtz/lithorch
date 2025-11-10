@@ -1,0 +1,32 @@
+[project]
+name = "lithorch"
+version = "0.1.0"
+description = "High performance torch-based photolithography simulation."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Thomas Hirtz", email = "thomas.hirtz@pm.me" }
+]
+license = "BSD-3-Clause"
+license-files = ["LICENSE.md"]
+
+dependencies = [
+  "torch",
+  "numpy",
+  "Pillow",
+  "matplotlib",
+  "requests",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lithorch*"]
+
+[tool.setuptools.package-data]
+"lithorch" = [
+  "kernels/*.npy",
+  "scales/*.npy"
+]
