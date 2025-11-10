@@ -117,32 +117,32 @@ class LithographySimulator(nn.Module):
         self.register_buffer("scales",     s.to(device=device, dtype=torch.float32),     persistent=True)
 
     def forward(self, mask: torch.Tensor, margin: int | None = None) -> SimulationOutput:
-        m = self.margin if margin is None else int(margin)
-        x = pad_margin_2d(mask, m) if m > 0 else mask
+        margin = self.margin if margin is None else int(margin)
+        padded_mask = pad_margin_2d(mask, margin) if margin > 0 else mask
 
-        aerial = self.simulate_aerial_from_mask(x, margin=0)
+        aerial = self.simulate_aerial_from_mask(padded_mask, margin=0)
         resist = self.simulate_resist_from_aerial(aerial)
         printed = self.simulate_printed_from_resist(resist)
 
-        if m > 0:
-            aerial = crop_margin_2d(aerial, m)
-            resist = crop_margin_2d(resist, m)
-            printed = crop_margin_2d(printed, m)
+        if margin > 0:
+            aerial = crop_margin_2d(aerial, margin)
+            resist = crop_margin_2d(resist, margin)
+            printed = crop_margin_2d(printed, margin)
 
         return SimulationOutput(aerial=aerial, resist=resist, printed=printed)
 
     def simulate_aerial_from_mask(self, mask: torch.Tensor, margin: int | None = None) -> torch.Tensor:
-        m = self.margin if margin is None else int(margin)
-        x = pad_margin_2d(mask, m) if m > 0 else mask
+        margin = self.margin if margin is None else int(margin)
+        padded_mask = pad_margin_2d(mask, margin) if margin > 0 else mask
 
-        y = _SimulateAerialFromMask.apply(
-            x.to(self.dtype),           # mask
-            self.dose,                  # dose as float
-            self.kernels.detach(),      # stop-grad for constants
+        aerial = _SimulateAerialFromMask.apply(
+            padded_mask.to(self.dtype),
+            self.dose,
+            self.kernels.detach(),
             self.kernels_ct.detach(),
             self.scales.detach(),
         )
-        return crop_margin_2d(y, m) if m > 0 else y
+        return crop_margin_2d(aerial, margin) if margin > 0 else aerial
 
     def simulate_resist_from_aerial(self, aerial: torch.Tensor) -> torch.Tensor:
         return torch.sigmoid(self.resist_steepness * (aerial - self.resist_threshold)).to(aerial.dtype)
